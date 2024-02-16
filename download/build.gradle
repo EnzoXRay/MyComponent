@@ -1,0 +1,45 @@
+if(moduleRunAlone.toBoolean()){
+    apply plugin: 'com.android.application'
+}else{
+    apply plugin:  'com.android.library'
+}
+
+android {
+    compileSdkVersion compile_sdk_version.toInteger()
+
+    defaultConfig {
+        minSdkVersion min_sdk_version.toInteger()
+        targetSdkVersion target_sdk_version.toInteger()
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ moduleName : project.getName() ]
+            }
+        }
+    }
+
+    sourceSets {
+        main {
+            // 单独调试与集成调试时使用不同的 AndroidManifest.xml 文件
+            if (moduleRunAlone.toBoolean()) {
+                manifest.srcFile 'src/main/moduleManifest/AndroidManifest.xml'
+            } else {
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    annotationProcessor 'com.alibaba:arouter-compiler:1.1.4'
+    implementation project(":export_download")
+    implementation project(":base")
+    annotationProcessor 'com.github.hufeiyang.Android-AppLifecycleMgr:applifecycle-compiler:1.0.4'
+}
